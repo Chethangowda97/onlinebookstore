@@ -15,8 +15,7 @@ pipeline {
 
         stage('Build Application') {
             steps {
-                sh 'chmod +x mvnw'
-                sh './mvnw clean package -DskipTests'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
@@ -54,7 +53,7 @@ pipeline {
                 docker run -d \
                 --name onlinebookstore \
                 -p 80:8080 \
-                $DOCKER_IMAGE
+                chethan97/onlinebookstore
                 '''
             }
         }
