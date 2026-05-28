@@ -37,10 +37,4 @@ pipeline {
             echo 'Build failed'
         }
     }
-}                -p 80:8080 \
-                chethan97/onlinebookstore
-                '''
-            }
-        }
-    }
 }
