@@ -1,58 +1,43 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_IMAGE = "chethan97/onlinebookstore"
+    tools {
+        jdk 'JDK17'
+        maven 'Maven'
     }
 
     stages {
 
-        stage('Clone Code') {
+        stage('Clone Repository') {
             steps {
-                git 'https://github.com/Chethangowda97/onlinebookstore.git'
+                git branch: 'master',
+                url: 'https://github.com/Chethangowda97/onlinebookstore.git'
             }
         }
 
-        stage('Build Application') {
+        stage('Build JAR') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh 'mvn clean package'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Verify Target Folder') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh 'ls -la target'
             }
         }
+    }
 
-        stage('Docker Login') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                }
-            }
+    post {
+        success {
+            echo 'JAR file created successfully inside target directory'
         }
 
-        stage('Push Docker Image') {
-            steps {
-                sh 'docker push $DOCKER_IMAGE'
-            }
+        failure {
+            echo 'Build failed'
         }
-
-        stage('Deploy Container') {
-            steps {
-                sh '''
-                docker stop onlinebookstore || true
-                docker rm onlinebookstore || true
-
-                docker run -d \
-                --name onlinebookstore \
-                -p 80:8080 \
+    }
+}                -p 80:8080 \
                 chethan97/onlinebookstore
                 '''
             }
