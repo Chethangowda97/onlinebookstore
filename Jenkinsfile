@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'JDK17'
-        maven 'Maven'
-    }
-
     stages {
 
         stage('Clone Repository') {
@@ -15,7 +10,14 @@ pipeline {
             }
         }
 
-        stage('Build JAR') {
+        stage('Check Java & Maven') {
+            steps {
+                sh 'java -version'
+                sh 'mvn -version'
+            }
+        }
+
+        stage('Build JAR/WAR') {
             steps {
                 sh 'mvn clean package'
             }
@@ -30,7 +32,7 @@ pipeline {
 
     post {
         success {
-            echo 'JAR file created successfully inside target directory'
+            echo 'Build completed successfully'
         }
 
         failure {
